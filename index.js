@@ -48,7 +48,9 @@ function elementPlaceholder() {
 }
 
 function attr(name, value) {
-	_push(' ' + name + '="' + value + '"', false)
+        if (typeof value !== 'function') {
+                _push(' ' + name + '="' + value + '"', false)
+        }
 }
 
 function text(value, formatters) {
