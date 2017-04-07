@@ -16,6 +16,14 @@ function elementOpen() {
 function elementOpenStart(tagname, key, staticPropertyValuePairs) {
 	_push('<' + tagname, true)
 
+        var keyType = typeof key;
+        var isValidKey = (keyType === 'string' || keyType === 'number');
+        var strKey = isValidKey && ('' + key);
+
+        if (_options.ignoreKeys === false && strKey) {
+                attr('key', strKey);
+        }
+
 	if (staticPropertyValuePairs && staticPropertyValuePairs.length > 0) {
 		_attrsArray(staticPropertyValuePairs)
 	}
@@ -95,11 +103,11 @@ function _attrsArray(attrsArray) {
 }
 
 function _nestingSpace() {
-	return Array(_nestingCount).join(_prettyPrint)
+	return Array(_nestingCount).join(_options.prettyPrint)
 }
 
 function _push2Array(token, needsFormatting) {
-	if (_prettyPrint && needsFormatting) {
+	if (_options.prettyPrint && needsFormatting) {
 		_buffer.push('\n')
 		_buffer.push(_nestingSpace())
 		_buffer.push(token)
@@ -109,7 +117,7 @@ function _push2Array(token, needsFormatting) {
 }
 
 function _push2Stream(token, needsFormatting) {
-	if (_prettyPrint && needsFormatting) {
+	if (_options.prettyPrint && needsFormatting) {
 		_output.write('\n')
 		_output.write(_nestingSpace())
 		_output.write(token)
@@ -127,8 +135,8 @@ function _reset() {
 /*
 	Configuration api
 */
-function setOutput(prettyPrint, output, doneCallback, keepOpen) {
-	_prettyPrint = prettyPrint
+function setOutput(options = {}, output, doneCallback, keepOpen) {
+	_options = Object.assign({}, _defaultOptions, options);
 	_output = output ? output : {}
 	_isStreamOutput = output && output.write ? true : false
 	_doneCallback = typeof doneCallback === 'function' ? doneCallback : undefined
@@ -156,7 +164,12 @@ var _elementDummy = {
 	addEventListener: function () {}
 }
 
-var _prettyPrint;
+var _defaultOptions = {
+    prettyPrint: undefined,
+    ignoreKeys: true,
+};
+
+var _options;
 var _output;
 var _isStreamOutput;
 var _doneCallback;
@@ -168,7 +181,6 @@ var _nestingCount;
 var _push;
 
 _reset()
-
 
 module.exports =  {
 	// IncrementalDOM api mock
